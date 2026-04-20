@@ -293,24 +293,6 @@ export default function Playground({ initialShape }: PlaygroundProps) {
     }
   };
 
-  const downloadSVG = () => {
-    const svg = toSVGString({
-      size: 600,
-      color,
-      bg,
-      innerSize: shape.innerSize,
-      offsetX: shape.offsetX,
-      offsetY: shape.offsetY,
-      wA: shape.wA, wB: shape.wB, wC: shape.wC, wD: shape.wD,
-      clampCorners,
-    });
-    const blob = new Blob([svg], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'palindromo-x.svg'; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
   const downloadPNG = async () => {
     const svg = toSVGString({
       size: 1200,
@@ -449,7 +431,6 @@ export default function Playground({ initialShape }: PlaygroundProps) {
 
         {/* Download */}
         <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 16, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button className="pg-bigbtn" onClick={downloadSVG}>Scarica SVG</button>
           <button className="pg-bigbtn" onClick={downloadPNG}>Scarica PNG</button>
         </div>
 

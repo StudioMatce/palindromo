@@ -66,16 +66,6 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     [shape],
   );
 
-  const downloadSVG = useCallback(() => {
-    const blob = new Blob([shapeSVG], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${shape.code}.svg`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }, [shapeSVG, shape.code]);
-
   // Genera un badge PNG 600x800 con la X, il nome, e il quadrante
   const downloadPNG = useCallback(async () => {
     const W = 600, H = 800;
@@ -102,13 +92,13 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
 
     // Nome
     ctx.fillStyle = '#ffffff';
-    ctx.font = '400 40px "Cormorant Garamond", Georgia, serif';
+    ctx.font = '400 40px "DM Mono", ui-monospace, monospace';
     ctx.textAlign = 'center';
     ctx.fillText(name || 'Anonimo', W / 2, 500);
 
     // Titolo poetico
     ctx.fillStyle = '#f2f2f2';
-    ctx.font = '400 20px "Cormorant Garamond", Georgia, serif';
+    ctx.font = '400 20px "DM Mono", ui-monospace, monospace';
     ctx.fillText(poetic.title, W / 2, 534);
 
     // Descrizione (va a capo ~52 caratteri)
@@ -202,13 +192,10 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         <div className="reveal-poetic-title">{poetic.title}</div>
         <div className="reveal-poetic-desc">{poetic.desc}</div>
 
-        {/* Bottoni download */}
+        {/* Bottone download */}
         <div className="reveal-buttons">
           <button onClick={downloadPNG} className="dl-btn">
             Scarica badge PNG
-          </button>
-          <button onClick={downloadSVG} className="dl-btn">
-            Scarica X (SVG)
           </button>
         </div>
 
@@ -216,6 +203,14 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         <button onClick={onPlayground} className="reveal-playground-link">
           Gioca con la tua X &rarr;
         </button>
+
+        {/* Logo TEDxConegliano */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/tedx-logo-white.svg"
+          alt="TEDxConegliano"
+          style={{ marginTop: 80, height: 28, width: 'auto', opacity: 0.5 }}
+        />
       </div>
     </div>
   );

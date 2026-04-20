@@ -34,6 +34,14 @@ export default function Landing({ onNext }: LandingProps) {
         <span>Scopri</span>
         <span className="landing-cta-arrow">→</span>
       </a>
+
+      {/* Logo TEDxConegliano */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/tedx-logo-white.svg"
+        alt="TEDxConegliano"
+        className="landing-tedx-logo"
+      />
     </div>
   );
 }
