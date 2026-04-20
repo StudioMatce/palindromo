@@ -97,33 +97,35 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
   // Badge PNG nello stile del visual TEDxConegliano:
   // sfondo chiaro, griglia rossa, logo in alto, X grande, info in basso
   const downloadPNG = useCallback(async () => {
-    const W = 750;
+    // Formato 9:16 verticale (standard Instagram/TikTok story)
+    const W = 1080;
+    const H = 1920;
     const RED = '#eb0028';
     const BG = '#f0efed';
     const MONO = '"DM Mono", ui-monospace, monospace';
-    const PAD = 40;
-    const LINE_W = 1;
-    const BOX_PAD = 24; // padding interno del box della X
+    const PAD = 56;
+    const LINE_W = 1.5;
+    const BOX_PAD = 32; // padding interno del box della X
 
-    // Misure layout
-    const logoAreaH = 100;
+    // Misure layout proporzionate al 9:16
+    const logoAreaH = 140;
     const boxTop = PAD + logoAreaH;
-    const boxH = 660;
-    const boxBottom = boxTop + boxH;
     const boxLeft = PAD;
     const boxRight = W - PAD;
     const boxW = boxRight - boxLeft;
 
     // Griglia: 3 righe sotto il box
-    const ROW_H = 80;
+    const ROW_H = 110;
+    const gridH = ROW_H * 3;
+    // Il box della X occupa tutto lo spazio tra logo e griglia
+    const boxBottom = H - PAD - gridH;
+    const boxH = boxBottom - boxTop;
+
     const gridTop = boxBottom;
     const row1Bottom = gridTop + ROW_H;
     const row2Bottom = row1Bottom + ROW_H;
     const row3Bottom = row2Bottom + ROW_H;
     const midX = boxLeft + boxW * 0.55;
-
-    // Altezza totale del canvas calcolata dal contenuto
-    const H = row3Bottom + PAD;
 
     const canvas = document.createElement('canvas');
     canvas.width = W * 2;
@@ -137,11 +139,11 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
 
     // --- Logo TEDxConegliano in alto ---
     const logoImg = await loadImage('/tedx-logo-dark.svg');
-    const logoH = 50;
+    const logoH = 70;
     const logoW = logoImg.naturalWidth
       ? (logoImg.naturalWidth / logoImg.naturalHeight) * logoH
       : logoH * 6.8;
-    ctx.drawImage(logoImg, PAD, PAD + 10, logoW, logoH);
+    ctx.drawImage(logoImg, PAD, PAD + 20, logoW, logoH);
 
     // --- Box principale con la X ---
     // Prima disegna la X (senza sfondo, solo la forma rossa)
@@ -197,35 +199,35 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     ctx.textAlign = 'left';
 
     // Riga 1: "Palindromo"
-    ctx.font = `400 32px ${MONO}`;
-    ctx.fillText('Palindromo', boxLeft + 16, row1Bottom - 24);
+    ctx.font = `400 46px ${MONO}`;
+    ctx.fillText('Palindromo', boxLeft + 24, row1Bottom - 32);
 
     // Riga 2 sinistra: payoff
-    ctx.font = `400 15px ${MONO}`;
+    ctx.font = `400 20px ${MONO}`;
     const payoffLines = wrap('Apparente uguale, reale diverso', 22);
     payoffLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 16, row1Bottom + 30 + i * 20);
+      ctx.fillText(ln, boxLeft + 24, row1Bottom + 38 + i * 26);
     });
 
     // Riga 2 destra: nome
-    ctx.font = `400 15px ${MONO}`;
+    ctx.font = `400 20px ${MONO}`;
     const userName = name || 'Anonimo';
-    ctx.fillText(userName, midX + 16, row1Bottom + 30);
+    ctx.fillText(userName, midX + 24, row1Bottom + 38);
 
     // Riga 3 sinistra: titolo poetico
-    ctx.font = `400 13px ${MONO}`;
+    ctx.font = `400 17px ${MONO}`;
     const poeticLines = wrap(poetic.title, 26);
     poeticLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 16, row2Bottom + 26 + i * 18);
+      ctx.fillText(ln, boxLeft + 24, row2Bottom + 34 + i * 22);
     });
 
     // Riga 3 destra sopra: codice
-    ctx.font = `400 13px ${MONO}`;
-    ctx.fillText(shape.code, midX + 16, row2Bottom + 26);
+    ctx.font = `400 17px ${MONO}`;
+    ctx.fillText(shape.code, midX + 24, row2Bottom + 34);
 
     // Riga 3 destra sotto: data
-    ctx.font = `400 15px ${MONO}`;
-    ctx.fillText('27 Giugno 2026', midX + 16, row3Mid + 26);
+    ctx.font = `400 20px ${MONO}`;
+    ctx.fillText('27 Giugno 2026', midX + 24, row3Mid + 34);
 
     canvas.toBlob((blob) => {
       if (!blob) return;
