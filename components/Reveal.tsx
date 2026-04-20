@@ -103,23 +103,25 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     const RED = '#eb0028';
     const BG = '#f0efed';
     const MONO = '"DM Mono", ui-monospace, monospace';
-    const PAD = 56;
+    const SIDE_PAD = 56;
     const LINE_W = 1.5;
-    const BOX_PAD = 32; // padding interno del box della X
 
-    // Misure layout proporzionate al 9:16
-    const logoAreaH = 140;
-    const boxTop = PAD + logoAreaH;
-    const boxLeft = PAD;
-    const boxRight = W - PAD;
-    const boxW = boxRight - boxLeft;
-
-    // Griglia: 3 righe sotto il box
-    const ROW_H = 110;
+    // Dimensioni dei blocchi
+    const logoAreaH = 120; // spazio per il logo sopra il box
+    const boxW = W - SIDE_PAD * 2;
+    const boxH = boxW; // box quadrato, la X è quadrata
+    const ROW_H = 100;
     const gridH = ROW_H * 3;
-    // Il box della X occupa tutto lo spazio tra logo e griglia
-    const boxBottom = H - PAD - gridH;
-    const boxH = boxBottom - boxTop;
+
+    // Altezza totale della composizione
+    const totalH = logoAreaH + boxH + gridH;
+    // Centrata verticalmente nel canvas
+    const topOffset = (H - totalH) / 2;
+
+    const boxLeft = SIDE_PAD;
+    const boxRight = W - SIDE_PAD;
+    const boxTop = topOffset + logoAreaH;
+    const boxBottom = boxTop + boxH;
 
     const gridTop = boxBottom;
     const row1Bottom = gridTop + ROW_H;
@@ -143,20 +145,15 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     const logoW = logoImg.naturalWidth
       ? (logoImg.naturalWidth / logoImg.naturalHeight) * logoH
       : logoH * 6.8;
-    ctx.drawImage(logoImg, PAD, PAD + 20, logoW, logoH);
+    // Logo centrato verticalmente nell'area logo, allineato a sinistra
+    ctx.drawImage(logoImg, SIDE_PAD, topOffset + (logoAreaH - logoH) / 2, logoW, logoH);
 
     // --- Box principale con la X ---
-    // Prima disegna la X (senza sfondo, solo la forma rossa)
     const xImg = await loadImage(
       'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(shapeSVGForBadge)))
     );
-    // La X va dentro il box con padding
-    const xAreaW = boxW - BOX_PAD * 2;
-    const xAreaH = boxH - BOX_PAD * 2;
-    const xSize = Math.min(xAreaW, xAreaH);
-    const xLeft = boxLeft + BOX_PAD + (xAreaW - xSize) / 2;
-    const xTop = boxTop + BOX_PAD + (xAreaH - xSize) / 2;
-    ctx.drawImage(xImg, xLeft, xTop, xSize, xSize);
+    // La X riempie il box (è quadrata, il box è quadrato)
+    ctx.drawImage(xImg, boxLeft, boxTop, boxW, boxH);
 
     // Bordo rosso del box (disegnato DOPO la X, così copre eventuali sbavature)
     ctx.strokeStyle = RED;
