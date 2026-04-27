@@ -147,7 +147,7 @@ export function computeShape(answers: (number | string)[]): ComputedShape {
 
   const big = g === 'grande' ? 35 : 0;
   const jitter = Math.round((rng() - 0.5) * 16);
-  const innerSize = Math.max(60, Math.min(150, 100 + big + jitter));
+  const innerSize = Math.max(60, Math.min(130, 90 + big + jitter));
   const maxOff = 170 - innerSize;
 
   const offsetX = X * maxOff;
@@ -201,7 +201,7 @@ export function generatePreviewVariants() {
   const seeds = [11, 29, 47, 73, 101, 137, 181];
   return seeds.map((seed) => {
     const rng = mulberry32(seed);
-    const innerSize = 60 + Math.floor(rng() * 90);
+    const innerSize = 60 + Math.floor(rng() * 70);
     const maxOff = 170 - innerSize;
     const ox = (rng() * 2 - 1) * maxOff * 0.7;
     const oy = (rng() * 2 - 1) * maxOff * 0.7;

@@ -386,9 +386,9 @@ export default function Playground({ initialShape }: PlaygroundProps) {
           label="Dimensione"
           value={shape.innerSize}
           min={60}
-          max={150}
+          max={130}
           onChange={(v) => set('innerSize', v)}
-          onRandom={() => set('innerSize', 60 + Math.floor(Math.random() * 90))}
+          onRandom={() => set('innerSize', 60 + Math.floor(Math.random() * 70))}
         />
 
         <PositionMap
