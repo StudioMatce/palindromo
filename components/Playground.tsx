@@ -385,10 +385,10 @@ export default function Playground({ initialShape }: PlaygroundProps) {
         <Slider
           label="Dimensione"
           value={shape.innerSize}
-          min={30}
-          max={100}
+          min={60}
+          max={150}
           onChange={(v) => set('innerSize', v)}
-          onRandom={() => set('innerSize', 30 + Math.floor(Math.random() * 70))}
+          onRandom={() => set('innerSize', 60 + Math.floor(Math.random() * 90))}
         />
 
         <PositionMap
