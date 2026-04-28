@@ -201,31 +201,31 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     ctx.textAlign = 'left';
 
     // "Palindromo"
-    ctx.font = `400 46px ${MONO}`;
-    ctx.fillText('Palindromo', L + 24, ugR1Bottom - 40);
+    ctx.font = `400 50px ${MONO}`;
+    ctx.fillText('Palindromo', L + 24, ugR1Bottom - 38);
 
     // Payoff (sinistra riga 2)
-    ctx.font = `400 20px ${MONO}`;
-    const payoffLines = wrap('Apparente uguale, reale diverso', 20);
+    ctx.font = `400 32px ${MONO}`;
+    const payoffLines = wrap('Apparente uguale, reale diverso', 13);
     payoffLines.forEach((ln, i) => {
-      ctx.fillText(ln, L + 24, ugR2Top + 42 + i * 28);
+      ctx.fillText(ln, L + 24, ugR2Top + 50 + i * 38);
     });
 
     // Luogo (destra riga 2)
-    ctx.font = `400 20px ${MONO}`;
-    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 18);
+    ctx.font = `400 32px ${MONO}`;
+    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 12);
     locationLines.forEach((ln, i) => {
-      ctx.fillText(ln, MID + 24, ugR2Top + 42 + i * 28);
+      ctx.fillText(ln, MID + 24, ugR2Top + 50 + i * 38);
     });
 
     // Data (destra riga 3)
-    ctx.font = `400 22px ${MONO}`;
-    ctx.fillText('27 Giugno 2026', MID + 24, ugR3Top + 48);
+    ctx.font = `400 32px ${MONO}`;
+    ctx.fillText('27 Giugno 2026', MID + 24, ugR3Top + 52);
 
     // === LABEL CODICE (tra le due griglie, senza bordo) ===
-    ctx.font = `400 18px ${MONO}`;
+    ctx.font = `400 32px ${MONO}`;
     ctx.fillStyle = BLACK;
-    ctx.fillText(shape.code, L + 8, 1565);
+    ctx.fillText(shape.code, L + 8, 1568);
 
     // === GRIGLIA INFERIORE (bordi neri) ===
     ctx.strokeStyle = BLACK;
@@ -242,27 +242,27 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     ctx.fillStyle = BLACK;
 
     // Nome (sinistra)
-    ctx.font = `400 20px ${MONO}`;
+    ctx.font = `400 32px ${MONO}`;
     const userName = name || 'Nome\nCognome';
     const nameLines = userName.includes(' ')
       ? [userName.split(' ').slice(0, -1).join(' '), userName.split(' ').slice(-1)[0]]
       : userName.split('\n');
     nameLines.forEach((ln, i) => {
-      ctx.fillText(ln, L + 24, lgR1Top + 42 + i * 28);
+      ctx.fillText(ln, L + 24, lgR1Top + 50 + i * 38);
     });
 
     // Titolo poetico (destra)
-    ctx.font = `400 18px ${MONO}`;
-    const titleLines = wrap(poetic.title, 22);
+    ctx.font = `400 32px ${MONO}`;
+    const titleLines = wrap(poetic.title, 13);
     titleLines.forEach((ln, i) => {
-      ctx.fillText(ln, MID + 24, lgR1Top + 42 + i * 24);
+      ctx.fillText(ln, MID + 24, lgR1Top + 50 + i * 38);
     });
 
     // Descrizione poetica (full width)
-    ctx.font = `400 17px ${MONO}`;
-    const descLines = wrap(poetic.desc, 52);
+    ctx.font = `400 32px ${MONO}`;
+    const descLines = wrap(poetic.desc, 30);
     descLines.forEach((ln, i) => {
-      ctx.fillText(ln, L + 24, lgR2Top + 38 + i * 24);
+      ctx.fillText(ln, L + 24, lgR2Top + 48 + i * 38);
     });
 
     canvas.toBlob((blob) => {
