@@ -206,14 +206,14 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
 
     // Payoff (sinistra riga 2)
     ctx.font = `400 32px ${MONO}`;
-    const payoffLines = wrap('Apparente uguale, reale diverso', 13);
+    const payoffLines = wrap('Apparente uguale, reale diverso', 21);
     payoffLines.forEach((ln, i) => {
       ctx.fillText(ln, L + 24, ugR2Top + 50 + i * 38);
     });
 
     // Luogo (destra riga 2)
     ctx.font = `400 32px ${MONO}`;
-    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 12);
+    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 21);
     locationLines.forEach((ln, i) => {
       ctx.fillText(ln, MID + 24, ugR2Top + 50 + i * 38);
     });
@@ -253,14 +253,14 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
 
     // Titolo poetico (destra)
     ctx.font = `400 32px ${MONO}`;
-    const titleLines = wrap(poetic.title, 13);
+    const titleLines = wrap(poetic.title, 21);
     titleLines.forEach((ln, i) => {
       ctx.fillText(ln, MID + 24, lgR1Top + 50 + i * 38);
     });
 
     // Descrizione poetica (full width)
     ctx.font = `400 32px ${MONO}`;
-    const descLines = wrap(poetic.desc, 30);
+    const descLines = wrap(poetic.desc, 45);
     descLines.forEach((ln, i) => {
       ctx.fillText(ln, L + 24, lgR2Top + 48 + i * 38);
     });
