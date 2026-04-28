@@ -349,15 +349,17 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
           <button onClick={saveToCalendar} className="dl-btn dl-btn--secondary">
             Salva nel calendario
           </button>
-          <a href="/Palindromo_presentazione.pdf" download className="dl-btn dl-btn--secondary">
-            Scarica presentazione
-          </a>
         </div>
 
         {/* Link al playground */}
         <button onClick={onPlayground} className="reveal-playground-link">
           Gioca con la tua X &rarr;
         </button>
+
+        {/* Link presentazione */}
+        <a href="/Palindromo_presentazione.pdf" download className="reveal-playground-link">
+          Scarica presentazione &darr;
+        </a>
 
         {/* Logo TEDxConegliano */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
