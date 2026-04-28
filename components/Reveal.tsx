@@ -351,15 +351,15 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
           </button>
         </div>
 
-        {/* Link al playground */}
-        <button onClick={onPlayground} className="reveal-playground-link">
-          Gioca con la tua X &rarr;
-        </button>
-
         {/* Link presentazione */}
         <a href="/Palindromo_presentazione.pdf" download className="reveal-playground-link">
           Scarica presentazione &darr;
         </a>
+
+        {/* Link al playground */}
+        <button onClick={onPlayground} className="reveal-playground-link">
+          Gioca con la tua X &rarr;
+        </button>
 
         {/* Logo TEDxConegliano */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
