@@ -102,7 +102,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       'VERSION:2.0',
       'PRODID:-//TEDxConegliano//Palindromo//IT',
       'BEGIN:VEVENT',
-      'DTSTART:20260627T180000',
+      'DTSTART:20260627T170000',
       'DTEND:20260627T220000',
       'SUMMARY:TEDxConegliano — Palindromo',
       'LOCATION:Scuola Enologica Cerletti\\, Conegliano (TV)',
@@ -317,12 +317,6 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         {/* Titolo poetico */}
         <div className="reveal-poetic-title">{poetic.title}</div>
         <div className="reveal-poetic-desc">{poetic.desc}</div>
-
-        {/* Info evento */}
-        <div className="reveal-event-info">
-          <p className="reveal-event-date">Sabato 27 Giugno 2026</p>
-          <p className="reveal-event-location">Scuola Enologica Cerletti, Conegliano</p>
-        </div>
 
         {/* Bottoni azione */}
         <div className="reveal-buttons">

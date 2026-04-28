@@ -19,7 +19,7 @@ export default function Landing({ onNext }: LandingProps) {
 
       {/* Payoff */}
       <p className="landing-payoff">
-        Apparentemente uguale, ma non per forza identico.
+        Apparente uguale, reale diverso.
       </p>
 
       {/* CTA */}
