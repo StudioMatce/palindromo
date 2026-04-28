@@ -188,6 +188,59 @@ export function computeShape(answers: (number | string)[]): ComputedShape {
   };
 }
 
+// Applica piccole variazioni alla forma basate sul nome dell'utente.
+// Il nome viene hashato e produce delta deterministici su tutti i parametri,
+// così due persone con le stesse risposte ma nomi diversi hanno X diverse.
+export function personalizeShape(base: ComputedShape, name: string): ComputedShape {
+  const trimmed = name.trim().toLowerCase();
+  if (!trimmed) return base;
+
+  const rng = mulberry32(hashSeed(trimmed));
+
+  // Variazioni piccole: ±8% su innerSize, ±6px su offset, ±8 su tacche
+  const dInner = Math.round((rng() - 0.5) * base.innerSize * 0.16);
+  const innerSize = clamp(base.innerSize + dInner, 60, 130);
+
+  const maxOff = 170 - innerSize;
+  const dOx = (rng() - 0.5) * 12;
+  const dOy = (rng() - 0.5) * 12;
+  const offsetX = clamp(base.offsetX + dOx, -maxOff, maxOff);
+  const offsetY = clamp(base.offsetY + dOy, -maxOff, maxOff);
+
+  const dA = Math.round((rng() - 0.5) * 16);
+  const dB = Math.round((rng() - 0.5) * 16);
+  const dC = Math.round((rng() - 0.5) * 16);
+  const dD = Math.round((rng() - 0.5) * 16);
+
+  // Rigenera il codice includendo il nome
+  const codeStr = base.code + ':' + trimmed;
+  const h = hashSeed(codeStr);
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const N = '0123456789';
+  const pick = (pool: string, n: number) => {
+    let s = '';
+    let x = h;
+    for (let i = 0; i < n; i++) {
+      x = (x * 1103515245 + 12345) >>> 0;
+      s += pool[x % pool.length];
+    }
+    return s;
+  };
+  const code = `X-${pick(A, 1)}${pick(N, 1)}${pick(A, 1)}${pick(N, 1)}-${pick(A, 1)}${pick(N, 1)}`;
+
+  return {
+    ...base,
+    innerSize,
+    offsetX,
+    offsetY,
+    wA: clamp(base.wA + dA, 20, 90),
+    wB: clamp(base.wB + dB, 20, 90),
+    wC: clamp(base.wC + dC, 20, 90),
+    wD: clamp(base.wD + dD, 20, 90),
+    code,
+  };
+}
+
 // Forma parziale durante il survey — le domande non risposte valgono 0
 export function partialShape(partialAnswers: (number | string)[]): ComputedShape {
   const padded = [...partialAnswers];

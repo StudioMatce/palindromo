@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { type ComputedShape, toSVGString } from '@/lib/shape';
+import { type ComputedShape, toSVGString, personalizeShape } from '@/lib/shape';
 import XShape from './XShape';
 import SemioticSquare from './SemioticSquare';
 
@@ -47,6 +47,12 @@ function poeticLabel(X: number, Y: number) {
 export default function Reveal({ shape, onPlayground }: RevealProps) {
   const [name, setName] = useState('');
 
+  // La shape viene personalizzata in base al nome: piccole variazioni deterministiche
+  const personalizedShape = useMemo(
+    () => personalizeShape(shape, name),
+    [shape, name],
+  );
+
   const poetic = useMemo(() => poeticLabel(shape.rawX, shape.rawY), [shape.rawX, shape.rawY]);
 
   // SVG della X senza sfondo (per il badge, lo sfondo è già sul canvas)
@@ -56,15 +62,15 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         size: 400,
         color: '#eb0028',
         bg: 'transparent',
-        innerSize: shape.innerSize,
-        offsetX: shape.offsetX,
-        offsetY: shape.offsetY,
-        wA: shape.wA,
-        wB: shape.wB,
-        wC: shape.wC,
-        wD: shape.wD,
+        innerSize: personalizedShape.innerSize,
+        offsetX: personalizedShape.offsetX,
+        offsetY: personalizedShape.offsetY,
+        wA: personalizedShape.wA,
+        wB: personalizedShape.wB,
+        wC: personalizedShape.wC,
+        wD: personalizedShape.wD,
       }),
-    [shape],
+    [personalizedShape],
   );
 
   // Carica un'immagine da URL e la ritorna come HTMLImageElement
@@ -274,7 +280,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, 'image/png');
-  }, [shapeSVGForBadge, name, poetic, shape.code]);
+  }, [shapeSVGForBadge, name, poetic, personalizedShape.code]);
 
   return (
     <div className="reveal-screen">
@@ -282,18 +288,19 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         {/* Eyebrow */}
         <div className="reveal-eyebrow">la tua X</div>
 
-        {/* La X personale */}
+        {/* La X personale — si adatta in tempo reale al nome */}
         <div className="reveal-shape">
           <XShape
             size={260}
             color="#eb0028"
-            innerSize={shape.innerSize}
-            offsetX={shape.offsetX}
-            offsetY={shape.offsetY}
-            wA={shape.wA}
-            wB={shape.wB}
-            wC={shape.wC}
-            wD={shape.wD}
+            transition
+            innerSize={personalizedShape.innerSize}
+            offsetX={personalizedShape.offsetX}
+            offsetY={personalizedShape.offsetY}
+            wA={personalizedShape.wA}
+            wB={personalizedShape.wB}
+            wC={personalizedShape.wC}
+            wD={personalizedShape.wD}
           />
         </div>
 
@@ -307,7 +314,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         />
 
         {/* Codice identificativo */}
-        <div className="reveal-code">{shape.code}</div>
+        <div className="reveal-code">{personalizedShape.code}</div>
 
         {/* Quadrato semiotico */}
         <div style={{ marginTop: 80 }}>
