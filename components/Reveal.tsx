@@ -276,7 +276,27 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, 'image/png');
-  }, [shapeSVGForBadge, name, poetic, personalizedShape.code]);
+
+    // Salva la X su Netlify Blobs (fire & forget, non blocca il download)
+    fetch('/.netlify/functions/shapes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.trim() || 'Anonimo',
+        code: personalizedShape.code,
+        innerSize: personalizedShape.innerSize,
+        offsetX: personalizedShape.offsetX,
+        offsetY: personalizedShape.offsetY,
+        wA: personalizedShape.wA,
+        wB: personalizedShape.wB,
+        wC: personalizedShape.wC,
+        wD: personalizedShape.wD,
+        rawX: personalizedShape.rawX,
+        rawY: personalizedShape.rawY,
+        poetic: poetic.title,
+      }),
+    }).catch(() => {}); // silenzioso se fallisce
+  }, [shapeSVGForBadge, name, poetic, personalizedShape]);
 
   return (
     <div className="reveal-screen">
