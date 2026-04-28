@@ -349,6 +349,9 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
           <button onClick={saveToCalendar} className="dl-btn dl-btn--secondary">
             Salva nel calendario
           </button>
+          <a href="/Palindromo_presentazione.pdf" download className="dl-btn dl-btn--secondary">
+            Scarica presentazione
+          </a>
         </div>
 
         {/* Link al playground */}
