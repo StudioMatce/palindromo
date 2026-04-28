@@ -120,41 +120,52 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, [shape.code]);
 
-  // Badge PNG nello stile del visual TEDxConegliano:
-  // sfondo chiaro, griglia rossa, logo in alto, X grande, info in basso
+  // Badge PNG — layout fedele al visual TEDxConegliano
   const downloadPNG = useCallback(async () => {
-    // Formato 9:16 verticale (standard Instagram/TikTok story)
     const W = 1080;
     const H = 1920;
     const RED = '#eb0028';
     const BG = '#f0efed';
     const MONO = '"DM Mono", ui-monospace, monospace';
-    const SIDE_PAD = 56;
+    const PAD = 56;
     const LINE_W = 1.5;
 
-    // Dimensioni dei blocchi
-    const logoAreaH = 120; // spazio per il logo sopra il box
-    const boxW = W - SIDE_PAD * 2;
-    const boxH = boxW; // box quadrato, la X è quadrata
+    // --- Misure layout ---
+    const logoAreaH = 120;
+    const boxW = W - PAD * 2;
+    const boxH = boxW; // box quadrato per la X
     const ROW_H = 90;
-    const gridH = ROW_H * 4; // 4 righe: titolo, payoff+nome, poetica+codice, data+luogo
+    // Griglia superiore: 3 righe (Palindromo | payoff+luogo | vuoto+data)
+    const upperGridH = ROW_H * 3;
+    // Gap tra griglia superiore e sezione inferiore
+    const GAP = 50;
+    // Griglia inferiore: 2 righe (nome+poeticTitle | poeticDesc)
+    const lowerRow1H = 90;
+    const lowerRow2H = 80;
+    const lowerGridH = lowerRow1H + lowerRow2H;
+    // Label "codice" tra le due griglie
+    const codeLabelH = 40;
 
-    // Altezza totale della composizione
-    const totalH = logoAreaH + boxH + gridH;
-    // Centrata verticalmente nel canvas
+    const totalH = logoAreaH + boxH + upperGridH + GAP + codeLabelH + lowerGridH;
     const topOffset = (H - totalH) / 2;
 
-    const boxLeft = SIDE_PAD;
-    const boxRight = W - SIDE_PAD;
+    const L = PAD; // left
+    const R = W - PAD; // right
     const boxTop = topOffset + logoAreaH;
     const boxBottom = boxTop + boxH;
 
-    const gridTop = boxBottom;
-    const row1Bottom = gridTop + ROW_H;
-    const row2Bottom = row1Bottom + ROW_H;
-    const row3Bottom = row2Bottom + ROW_H;
-    const row4Bottom = row3Bottom + ROW_H;
-    const midX = boxLeft + boxW * 0.55;
+    // Griglia superiore
+    const ugTop = boxBottom; // attaccata al box
+    const ugR1 = ugTop + ROW_H;
+    const ugR2 = ugR1 + ROW_H;
+    const ugR3 = ugR2 + ROW_H;
+    const midX = L + boxW * 0.5; // colonna centrale al 50%
+
+    // Sezione inferiore
+    const codeY = ugR3 + GAP;
+    const lgTop = codeY + codeLabelH;
+    const lgR1 = lgTop + lowerRow1H;
+    const lgR2 = lgR1 + lowerRow2H;
 
     const canvas = document.createElement('canvas');
     canvas.width = W * 2;
@@ -162,91 +173,120 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     const ctx = canvas.getContext('2d')!;
     ctx.scale(2, 2);
 
-    // Sfondo chiaro
+    // Sfondo
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, W, H);
 
-    // --- Logo TEDxConegliano in alto ---
+    // --- Logo TEDxConegliano ---
     const logoImg = await loadImage('/tedx-logo-dark.svg');
     const logoH = 70;
     const logoW = logoImg.naturalWidth
       ? (logoImg.naturalWidth / logoImg.naturalHeight) * logoH
       : logoH * 6.8;
-    // Logo centrato verticalmente nell'area logo, allineato a sinistra
-    ctx.drawImage(logoImg, SIDE_PAD, topOffset + (logoAreaH - logoH) / 2, logoW, logoH);
+    ctx.drawImage(logoImg, PAD, topOffset + (logoAreaH - logoH) / 2, logoW, logoH);
 
-    // --- Box principale con la X (con padding interno) ---
+    // --- Box X con padding ---
     const xImg = await loadImage(
       'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(shapeSVGForBadge)))
     );
-    // Padding interno per non far toccare la X ai bordi del box
-    const xPad = boxW * 0.12;
-    ctx.drawImage(xImg, boxLeft + xPad, boxTop + xPad, boxW - xPad * 2, boxH - xPad * 2);
+    const xPad = boxW * 0.08;
+    ctx.drawImage(xImg, L + xPad, boxTop + xPad, boxW - xPad * 2, boxH - xPad * 2);
 
-    // Bordo rosso del box (disegnato DOPO la X, così copre eventuali sbavature)
+    // Bordo del box
     ctx.strokeStyle = RED;
     ctx.lineWidth = LINE_W;
-    ctx.strokeRect(boxLeft, boxTop, boxW, boxH);
+    ctx.strokeRect(L, boxTop, boxW, boxH);
 
-    // --- Griglia info ---
-    // Bordo esterno della griglia
-    ctx.strokeStyle = RED;
-    ctx.lineWidth = LINE_W;
-    ctx.strokeRect(boxLeft, gridTop, boxW, row4Bottom - gridTop);
+    // === GRIGLIA SUPERIORE ===
+    // Bordo esterno (include box + griglia come unico blocco continuo)
+    ctx.strokeRect(L, ugTop, boxW, upperGridH);
 
-    // Linea verticale centrale (righe 2-4)
-    ctx.beginPath();
-    ctx.moveTo(midX, row1Bottom);
-    ctx.lineTo(midX, row4Bottom);
-    ctx.stroke();
-
-    // Separatori orizzontali tra le righe
-    [row1Bottom, row2Bottom, row3Bottom].forEach((y) => {
+    // Separatori orizzontali
+    [ugR1, ugR2].forEach((y) => {
       ctx.beginPath();
-      ctx.moveTo(boxLeft, y);
-      ctx.lineTo(boxRight, y);
+      ctx.moveTo(L, y);
+      ctx.lineTo(R, y);
       ctx.stroke();
     });
 
-    // --- Testi ---
+    // Linea verticale centrale (solo righe 2 e 3)
+    ctx.beginPath();
+    ctx.moveTo(midX, ugR1);
+    ctx.lineTo(midX, ugR3);
+    ctx.stroke();
+
+    // --- Testi griglia superiore ---
     ctx.fillStyle = RED;
     ctx.textAlign = 'left';
 
     // Riga 1: "Palindromo"
     ctx.font = `400 42px ${MONO}`;
-    ctx.fillText('Palindromo', boxLeft + 24, row1Bottom - 28);
+    ctx.fillText('Palindromo', L + 24, ugR1 - 28);
 
     // Riga 2 sinistra: payoff
     ctx.font = `400 18px ${MONO}`;
-    const payoffLines = wrap('Apparente uguale, reale diverso', 24);
+    const payoffLines = wrap('Apparente uguale, reale diverso', 20);
     payoffLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 24, row1Bottom + 34 + i * 24);
+      ctx.fillText(ln, L + 24, ugR1 + 34 + i * 24);
     });
 
-    // Riga 2 destra: nome
+    // Riga 2 destra: luogo
     ctx.font = `400 18px ${MONO}`;
-    const userName = name || 'Anonimo';
-    ctx.fillText(userName, midX + 24, row1Bottom + 34);
-
-    // Riga 3 sinistra: titolo poetico
-    ctx.font = `400 16px ${MONO}`;
-    const poeticLines = wrap(poetic.title, 28);
-    poeticLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 24, row2Bottom + 32 + i * 22);
+    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 18);
+    locationLines.forEach((ln, i) => {
+      ctx.fillText(ln, midX + 24, ugR1 + 34 + i * 24);
     });
 
-    // Riga 3 destra: codice
+    // Riga 3 destra: data
+    ctx.font = `400 20px ${MONO}`;
+    ctx.fillText('27 Giugno 2026', midX + 24, ugR2 + 38);
+
+    // === LABEL CODICE ===
     ctx.font = `400 16px ${MONO}`;
-    ctx.fillText(shape.code, midX + 24, row2Bottom + 32);
+    ctx.fillStyle = RED;
+    ctx.fillText(shape.code, L + 4, codeY + codeLabelH - 8);
 
-    // Riga 4 sinistra: data evento
+    // === GRIGLIA INFERIORE ===
+    ctx.strokeStyle = RED;
+    ctx.lineWidth = LINE_W;
+
+    // Riga 1: nome | titolo poetico
+    ctx.strokeRect(L, lgTop, boxW, lowerRow1H);
+    // Linea verticale
+    ctx.beginPath();
+    ctx.moveTo(midX, lgTop);
+    ctx.lineTo(midX, lgR1);
+    ctx.stroke();
+
+    // Riga 2: descrizione poetica (full width, bordo solo laterale e sotto)
+    ctx.strokeRect(L, lgR1, boxW, lowerRow2H);
+
+    // --- Testi griglia inferiore ---
+    ctx.fillStyle = RED;
+
+    // Nome
     ctx.font = `400 18px ${MONO}`;
-    ctx.fillText('Sabato 27 Giugno 2026', boxLeft + 24, row3Bottom + 34);
+    const userName = name || 'Nome\nCognome';
+    const nameLines = userName.includes(' ')
+      ? [userName.split(' ').slice(0, -1).join(' '), userName.split(' ').slice(-1)[0]]
+      : userName.split('\n');
+    nameLines.forEach((ln, i) => {
+      ctx.fillText(ln, L + 24, lgTop + 34 + i * 24);
+    });
 
-    // Riga 4 destra: luogo evento
-    ctx.font = `400 15px ${MONO}`;
-    ctx.fillText('Scuola Enologica Cerletti', midX + 24, row3Bottom + 28);
-    ctx.fillText('Conegliano', midX + 24, row3Bottom + 50);
+    // Titolo poetico
+    ctx.font = `400 17px ${MONO}`;
+    const titleLines = wrap(poetic.title, 20);
+    titleLines.forEach((ln, i) => {
+      ctx.fillText(ln, midX + 24, lgTop + 34 + i * 22);
+    });
+
+    // Descrizione poetica (full width)
+    ctx.font = `400 16px ${MONO}`;
+    const descLines = wrap(poetic.desc, 48);
+    descLines.forEach((ln, i) => {
+      ctx.fillText(ln, L + 24, lgR1 + 30 + i * 22);
+    });
 
     canvas.toBlob((blob) => {
       if (!blob) return;
