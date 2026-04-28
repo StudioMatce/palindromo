@@ -266,18 +266,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       ctx.fillText(ln, L + 24, lgR2Top + 48 + i * 38);
     });
 
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const safeName = (name.trim() || 'Anonimo').replace(/\s+/g, '_');
-      a.download = `TEDxConegliano_${personalizedShape.code}_${safeName}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }, 'image/png');
-
-    // Salva la X su Netlify Blobs (fire & forget, non blocca il download)
+    // Salva la X su Netlify Blobs PRIMA del download (su mobile il download può interrompere JS)
     fetch('/.netlify/functions/shapes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -295,7 +284,18 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         rawY: personalizedShape.rawY,
         poetic: poetic.title,
       }),
-    }).catch(() => {}); // silenzioso se fallisce
+    }).catch(() => {});
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = (name.trim() || 'Anonimo').replace(/\s+/g, '_');
+      a.download = `TEDxConegliano_${personalizedShape.code}_${safeName}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, 'image/png');
   }, [shapeSVGForBadge, name, poetic, personalizedShape]);
 
   return (
