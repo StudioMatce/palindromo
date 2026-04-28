@@ -276,7 +276,8 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${shape.code}-badge.png`;
+      const safeName = (name.trim() || 'Anonimo').replace(/\s+/g, '_');
+      a.download = `TEDxConegliano_${personalizedShape.code}_${safeName}.png`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, 'image/png');
