@@ -2,7 +2,7 @@ import { getStore } from '@netlify/blobs';
 import type { Context } from '@netlify/functions';
 
 export default async (req: Request, _context: Context) => {
-  const store = getStore('shapes');
+  const store = getStore({ name: 'shapes', consistency: 'strong' });
 
   // POST — salva una nuova X
   if (req.method === 'POST') {
