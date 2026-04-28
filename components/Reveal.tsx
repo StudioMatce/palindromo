@@ -111,7 +111,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       'DTSTART:20260627T170000',
       'DTEND:20260627T220000',
       'SUMMARY:TEDxConegliano — Palindromo',
-      'LOCATION:Scuola Enologica Cerletti\\, Conegliano (TV)',
+      'LOCATION:Conegliano (TV)',
       'DESCRIPTION:Apparente uguale\\, reale diverso. Il tuo codice: ' + personalizedShape.code,
       'END:VEVENT',
       'END:VCALENDAR',
@@ -217,12 +217,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       ctx.fillText(ln, L + 24, ugR2Top + 50 + i * 38);
     });
 
-    // Luogo (destra riga 2)
-    ctx.font = `400 32px ${MONO}`;
-    const locationLines = wrap('Scuola Enologica Cerletti Conegliano', 21);
-    locationLines.forEach((ln, i) => {
-      ctx.fillText(ln, MID + 24, ugR2Top + 50 + i * 38);
-    });
+    // Luogo (destra riga 2) — lasciato vuoto per ora
 
     // Data (destra riga 3)
     ctx.font = `400 32px ${MONO}`;
