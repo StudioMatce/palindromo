@@ -112,7 +112,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
       'DTEND:20260627T220000',
       'SUMMARY:TEDxConegliano — Palindromo',
       'LOCATION:Scuola Enologica Cerletti\\, Conegliano (TV)',
-      'DESCRIPTION:Apparente uguale\\, reale diverso. Il tuo codice: ' + shape.code,
+      'DESCRIPTION:Apparente uguale\\, reale diverso. Il tuo codice: ' + personalizedShape.code,
       'END:VEVENT',
       'END:VCALENDAR',
     ].join('\r\n');
@@ -124,7 +124,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     a.download = 'tedx-palindromo.ics';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }, [shape.code]);
+  }, [personalizedShape.code]);
 
   // Badge PNG — coordinate esatte dal file SVG di riferimento (1080×1920)
   const downloadPNG = useCallback(async () => {
@@ -231,7 +231,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     // === LABEL CODICE (tra le due griglie, senza bordo) ===
     ctx.font = `400 32px ${MONO}`;
     ctx.fillStyle = BLACK;
-    ctx.fillText(shape.code, L + 8, 1568);
+    ctx.fillText(personalizedShape.code, L + 8, 1568);
 
     // === GRIGLIA INFERIORE (bordi neri) ===
     ctx.strokeStyle = BLACK;
