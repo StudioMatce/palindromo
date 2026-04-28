@@ -94,6 +94,32 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     return lines;
   };
 
+  // Genera file .ics per salvare l'evento nel calendario
+  const saveToCalendar = useCallback(() => {
+    // L'evento è il 27 Giugno 2026 — usiamo un orario indicativo (18:00-22:00)
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//TEDxConegliano//Palindromo//IT',
+      'BEGIN:VEVENT',
+      'DTSTART:20260627T180000',
+      'DTEND:20260627T220000',
+      'SUMMARY:TEDxConegliano — Palindromo',
+      'LOCATION:Scuola Enologica Cerletti\\, Conegliano (TV)',
+      'DESCRIPTION:Apparente uguale\\, reale diverso. Il tuo codice: ' + shape.code,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tedx-palindromo.ics';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, [shape.code]);
+
   // Badge PNG nello stile del visual TEDxConegliano:
   // sfondo chiaro, griglia rossa, logo in alto, X grande, info in basso
   const downloadPNG = useCallback(async () => {
@@ -110,8 +136,8 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     const logoAreaH = 120; // spazio per il logo sopra il box
     const boxW = W - SIDE_PAD * 2;
     const boxH = boxW; // box quadrato, la X è quadrata
-    const ROW_H = 100;
-    const gridH = ROW_H * 3;
+    const ROW_H = 90;
+    const gridH = ROW_H * 4; // 4 righe: titolo, payoff+nome, poetica+codice, data+luogo
 
     // Altezza totale della composizione
     const totalH = logoAreaH + boxH + gridH;
@@ -127,6 +153,7 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     const row1Bottom = gridTop + ROW_H;
     const row2Bottom = row1Bottom + ROW_H;
     const row3Bottom = row2Bottom + ROW_H;
+    const row4Bottom = row3Bottom + ROW_H;
     const midX = boxLeft + boxW * 0.55;
 
     const canvas = document.createElement('canvas');
@@ -148,12 +175,13 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     // Logo centrato verticalmente nell'area logo, allineato a sinistra
     ctx.drawImage(logoImg, SIDE_PAD, topOffset + (logoAreaH - logoH) / 2, logoW, logoH);
 
-    // --- Box principale con la X ---
+    // --- Box principale con la X (con padding interno) ---
     const xImg = await loadImage(
       'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(shapeSVGForBadge)))
     );
-    // La X riempie il box (è quadrata, il box è quadrato)
-    ctx.drawImage(xImg, boxLeft, boxTop, boxW, boxH);
+    // Padding interno per non far toccare la X ai bordi del box
+    const xPad = boxW * 0.12;
+    ctx.drawImage(xImg, boxLeft + xPad, boxTop + xPad, boxW - xPad * 2, boxH - xPad * 2);
 
     // Bordo rosso del box (disegnato DOPO la X, così copre eventuali sbavature)
     ctx.strokeStyle = RED;
@@ -164,67 +192,61 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
     // Bordo esterno della griglia
     ctx.strokeStyle = RED;
     ctx.lineWidth = LINE_W;
-    ctx.strokeRect(boxLeft, gridTop, boxW, row3Bottom - gridTop);
+    ctx.strokeRect(boxLeft, gridTop, boxW, row4Bottom - gridTop);
 
-    // Linea verticale centrale (solo dentro la griglia)
+    // Linea verticale centrale (righe 2-4)
     ctx.beginPath();
-    ctx.moveTo(midX, gridTop);
-    ctx.lineTo(midX, row3Bottom);
+    ctx.moveTo(midX, row1Bottom);
+    ctx.lineTo(midX, row4Bottom);
     ctx.stroke();
 
-    // Riga 1: separatore in basso
-    ctx.beginPath();
-    ctx.moveTo(boxLeft, row1Bottom);
-    ctx.lineTo(boxRight, row1Bottom);
-    ctx.stroke();
-
-    // Riga 2: separatore in basso
-    ctx.beginPath();
-    ctx.moveTo(boxLeft, row2Bottom);
-    ctx.lineTo(boxRight, row2Bottom);
-    ctx.stroke();
-
-    // Separatore orizzontale nella colonna destra (riga 3: divide codice e data)
-    const row3Mid = row2Bottom + ROW_H / 2;
-    ctx.beginPath();
-    ctx.moveTo(midX, row3Mid);
-    ctx.lineTo(boxRight, row3Mid);
-    ctx.stroke();
+    // Separatori orizzontali tra le righe
+    [row1Bottom, row2Bottom, row3Bottom].forEach((y) => {
+      ctx.beginPath();
+      ctx.moveTo(boxLeft, y);
+      ctx.lineTo(boxRight, y);
+      ctx.stroke();
+    });
 
     // --- Testi ---
     ctx.fillStyle = RED;
     ctx.textAlign = 'left';
 
     // Riga 1: "Palindromo"
-    ctx.font = `400 46px ${MONO}`;
-    ctx.fillText('Palindromo', boxLeft + 24, row1Bottom - 32);
+    ctx.font = `400 42px ${MONO}`;
+    ctx.fillText('Palindromo', boxLeft + 24, row1Bottom - 28);
 
     // Riga 2 sinistra: payoff
-    ctx.font = `400 20px ${MONO}`;
-    const payoffLines = wrap('Apparente uguale, reale diverso', 22);
+    ctx.font = `400 18px ${MONO}`;
+    const payoffLines = wrap('Apparente uguale, reale diverso', 24);
     payoffLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 24, row1Bottom + 38 + i * 26);
+      ctx.fillText(ln, boxLeft + 24, row1Bottom + 34 + i * 24);
     });
 
     // Riga 2 destra: nome
-    ctx.font = `400 20px ${MONO}`;
+    ctx.font = `400 18px ${MONO}`;
     const userName = name || 'Anonimo';
-    ctx.fillText(userName, midX + 24, row1Bottom + 38);
+    ctx.fillText(userName, midX + 24, row1Bottom + 34);
 
     // Riga 3 sinistra: titolo poetico
-    ctx.font = `400 17px ${MONO}`;
-    const poeticLines = wrap(poetic.title, 26);
+    ctx.font = `400 16px ${MONO}`;
+    const poeticLines = wrap(poetic.title, 28);
     poeticLines.forEach((ln, i) => {
-      ctx.fillText(ln, boxLeft + 24, row2Bottom + 34 + i * 22);
+      ctx.fillText(ln, boxLeft + 24, row2Bottom + 32 + i * 22);
     });
 
-    // Riga 3 destra sopra: codice
-    ctx.font = `400 17px ${MONO}`;
-    ctx.fillText(shape.code, midX + 24, row2Bottom + 34);
+    // Riga 3 destra: codice
+    ctx.font = `400 16px ${MONO}`;
+    ctx.fillText(shape.code, midX + 24, row2Bottom + 32);
 
-    // Riga 3 destra sotto: data
-    ctx.font = `400 20px ${MONO}`;
-    ctx.fillText('27 Giugno 2026', midX + 24, row3Mid + 34);
+    // Riga 4 sinistra: data evento
+    ctx.font = `400 18px ${MONO}`;
+    ctx.fillText('Sabato 27 Giugno 2026', boxLeft + 24, row3Bottom + 34);
+
+    // Riga 4 destra: luogo evento
+    ctx.font = `400 15px ${MONO}`;
+    ctx.fillText('Scuola Enologica Cerletti', midX + 24, row3Bottom + 28);
+    ctx.fillText('Conegliano', midX + 24, row3Bottom + 50);
 
     canvas.toBlob((blob) => {
       if (!blob) return;
@@ -279,10 +301,19 @@ export default function Reveal({ shape, onPlayground }: RevealProps) {
         <div className="reveal-poetic-title">{poetic.title}</div>
         <div className="reveal-poetic-desc">{poetic.desc}</div>
 
-        {/* Bottone download */}
+        {/* Info evento */}
+        <div className="reveal-event-info">
+          <p className="reveal-event-date">Sabato 27 Giugno 2026</p>
+          <p className="reveal-event-location">Scuola Enologica Cerletti, Conegliano</p>
+        </div>
+
+        {/* Bottoni azione */}
         <div className="reveal-buttons">
           <button onClick={downloadPNG} className="dl-btn">
             Scarica badge PNG
+          </button>
+          <button onClick={saveToCalendar} className="dl-btn dl-btn--secondary">
+            Salva nel calendario
           </button>
         </div>
 

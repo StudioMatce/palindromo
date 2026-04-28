@@ -346,6 +346,28 @@ input { font-family: inherit; }
   transition: background 0.2s, color 0.2s;
 }
 .dl-btn:hover { background: #f2f2f2; color: #000000; }
+.dl-btn--secondary {
+  border-color: #eb0028;
+  color: #eb0028;
+}
+.dl-btn--secondary:hover { background: #eb0028; color: #ffffff; }
+
+.reveal-event-info {
+  margin-top: 60px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+.reveal-event-date {
+  font-size: 16px;
+  color: #eb0028;
+  letter-spacing: 0.05em;
+  margin: 0 0 6px;
+}
+.reveal-event-location {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+}
 
 .reveal-playground-link {
   margin-top: 60px;
